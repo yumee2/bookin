@@ -17,5 +17,7 @@ func NewRepository(dsn string) (*Repository, error) {
 		return nil, err
 	}
 
+	db.AutoMigrate(&House{})
+
 	return &Repository{db: db}, nil
 }
