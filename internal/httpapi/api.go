@@ -1,5 +1,4 @@
 // Package contains a router to create a HTTP server
-
 package httpapi
 
 import (
