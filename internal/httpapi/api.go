@@ -2,8 +2,6 @@
 package httpapi
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,13 +12,10 @@ type house struct {
 }
 
 // Registers a route for checking info about houses
-func NewRouter() *gin.Engine {
+func NewRouter(service HouseService) *gin.Engine {
 	r := gin.Default()
-
-	r.GET("/houses", func(c *gin.Context) {
-		c.JSON(http.StatusOK, []house{house{ID: 1, Name: "Big house", Capacity: 8},
-			house{ID: 2, Name: "Small house", Capacity: 4}})
-	})
+	handler := NewHouseHandler(service)
+	r.GET("/houses", handler.GetHouses)
 
 	return r
 }

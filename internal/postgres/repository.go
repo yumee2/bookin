@@ -4,6 +4,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"yumee/booking/internal/booking"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -21,39 +22,47 @@ func NewRepository(dsn string) (*Repository, error) {
 		return nil, err
 	}
 
-	db.AutoMigrate(&House{})
+	db.AutoMigrate(&HouseModel{})
 
 	return &Repository{db: db}, nil
 }
 
 // Return all houses with ID and its type
-func (r *Repository) getHouses(ctx context.Context) ([]House, error) {
-	var houses []House
+func (r *Repository) GetHouses(ctx context.Context) ([]booking.House, error) {
+	var houseModels []HouseModel
 
-	if err := r.db.WithContext(ctx).Find(&houses).Error; err != nil {
+	if err := r.db.WithContext(ctx).Find(&houseModels).Error; err != nil {
 		return nil, fmt.Errorf("get houses: %w", err)
+	}
+
+	houses := make([]booking.House, len(houseModels))
+
+	for i, houseModel := range houseModels {
+		houses[i] = toHouse(houseModel)
 	}
 
 	return houses, nil
 }
 
 // optional
-func (r *Repository) addHouse(ctx context.Context, houseType HouseType, capacity int) (*House, error) {
-	house := House{
+func (r *Repository) AddHouse(ctx context.Context, houseType HouseType, capacity int) (*booking.House, error) {
+	houseModel := HouseModel{
 		Type:     houseType,
 		Capacity: capacity,
 	}
 
-	if err := r.db.WithContext(ctx).Create(&house).Error; err != nil {
+	if err := r.db.WithContext(ctx).Create(&houseModel).Error; err != nil {
 		return nil, fmt.Errorf("create houses: %w", err)
 	}
+
+	house := toHouse(houseModel)
 
 	return &house, nil
 }
 
 // optional
-func (r *Repository) removeHouse(ctx context.Context, houseID int) error {
-	result := r.db.WithContext(ctx).Where("id = ?", houseID).Delete(&House{})
+func (r *Repository) RemoveHouse(ctx context.Context, houseID int) error {
+	result := r.db.WithContext(ctx).Where("id = ?", houseID).Delete(&HouseModel{})
 	if result.Error != nil {
 		return fmt.Errorf("delete houses: %w", result.Error)
 	}
