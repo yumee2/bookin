@@ -2,10 +2,8 @@ package postgres
 
 import "yumee/booking/internal/booking"
 
-type HouseType string
-
 type HouseModel struct {
-	ID       uint              `gorm:"primaryKey"`
+	ID       int               `gorm:"primaryKey"`
 	Type     booking.HouseType `gorm:"type:text;not null"`
 	Capacity int               `gorm:"not null"`
 }

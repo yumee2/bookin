@@ -5,14 +5,14 @@ import "fmt"
 type HouseType string
 
 const (
-	HouseTypeStandart HouseType = "standart"
+	HouseTypeStandart HouseType = "standard"
 	HouseTypeBig      HouseType = "big"
 )
 
 type House struct {
-	ID       uint
-	Type     HouseType
-	Capacity int
+	ID       int       `json:"id"`
+	Type     HouseType `json:"type"`
+	Capacity int       `json:"capacity"`
 }
 
 func ParseHouseType(value string) (HouseType, error) {

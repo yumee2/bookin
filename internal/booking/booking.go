@@ -34,6 +34,10 @@ func (b *BookingService) AddHouse(ctx context.Context, houseTypeRaw string, capa
 		return nil, InvalidHouseData
 	}
 
+	if capacity <= 0 {
+		return nil, InvalidHouseData
+	}
+
 	house, err := b.houseRepo.AddHouse(ctx, houseType, capacity)
 	if err != nil {
 		return nil, UnexpectedFailure
@@ -43,7 +47,7 @@ func (b *BookingService) AddHouse(ctx context.Context, houseTypeRaw string, capa
 }
 
 func (b *BookingService) RemoveHouse(ctx context.Context, houseID int) error {
-	if houseID < 0 {
+	if houseID <= 0 {
 		return HouseDoesNotExist
 	}
 

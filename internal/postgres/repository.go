@@ -22,7 +22,10 @@ func NewRepository(dsn string) (*Repository, error) {
 		return nil, err
 	}
 
-	db.AutoMigrate(&HouseModel{})
+	err = db.AutoMigrate(&HouseModel{})
+	if err != nil {
+		return nil, err
+	}
 
 	return &Repository{db: db}, nil
 }
