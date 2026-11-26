@@ -46,11 +46,13 @@ func (h *HouseHandler) AddHouse(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	newHouse, err := h.houseService.AddHouse(c.Request.Context(), req.Type, req.Capacity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusCreated, newHouse)
@@ -70,6 +72,7 @@ func (h *HouseHandler) RemoveHouse(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"status": "deleted"})
