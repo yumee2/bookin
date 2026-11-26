@@ -16,6 +16,8 @@ func NewRouter(service HouseService) *gin.Engine {
 	r := gin.Default()
 	handler := NewHouseHandler(service)
 	r.GET("/houses", handler.GetHouses)
+	r.POST("/houses", handler.AddHouse)
+	r.DELETE("/houses/:id", handler.RemoveHouse)
 
 	return r
 }

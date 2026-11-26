@@ -45,7 +45,7 @@ func (r *Repository) GetHouses(ctx context.Context) ([]booking.House, error) {
 }
 
 // optional
-func (r *Repository) AddHouse(ctx context.Context, houseType HouseType, capacity int) (*booking.House, error) {
+func (r *Repository) AddHouse(ctx context.Context, houseType booking.HouseType, capacity int) (*booking.House, error) {
 	houseModel := HouseModel{
 		Type:     houseType,
 		Capacity: capacity,
