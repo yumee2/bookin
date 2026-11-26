@@ -2,7 +2,7 @@ package booking
 
 import (
 	"context"
-	"fmt"
+	"errors"
 )
 
 type HouseRepository interface {
@@ -31,12 +31,12 @@ func (b *BookingService) GetHouses(ctx context.Context) ([]House, error) {
 func (b *BookingService) AddHouse(ctx context.Context, houseTypeRaw string, capacity int) (*House, error) {
 	houseType, err := ParseHouseType(houseTypeRaw)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid House Type")
+		return nil, InvalidHouseData
 	}
 
 	house, err := b.houseRepo.AddHouse(ctx, houseType, capacity)
 	if err != nil {
-		return nil, fmt.Errorf("Error trying to add a house: ", err)
+		return nil, UnexpectedFailure
 	}
 
 	return house, nil
@@ -44,8 +44,16 @@ func (b *BookingService) AddHouse(ctx context.Context, houseTypeRaw string, capa
 
 func (b *BookingService) RemoveHouse(ctx context.Context, houseID int) error {
 	if houseID < 0 {
-		return fmt.Errorf("House ID is invalid")
+		return HouseDoesNotExist
 	}
 
-	return b.houseRepo.RemoveHouse(ctx, houseID)
+	err := b.houseRepo.RemoveHouse(ctx, houseID)
+	if err != nil {
+		if errors.Is(err, HouseDoesNotExist) {
+			return HouseDoesNotExist
+		}
+		return UnexpectedFailure
+	}
+
+	return nil
 }

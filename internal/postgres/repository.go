@@ -68,7 +68,7 @@ func (r *Repository) RemoveHouse(ctx context.Context, houseID int) error {
 	}
 
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("house with this ID was not found")
+		return booking.HouseDoesNotExist
 	}
 
 	return nil

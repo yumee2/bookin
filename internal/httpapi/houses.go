@@ -2,6 +2,8 @@ package httpapi
 
 import (
 	"context"
+	"errors"
+	"log"
 	"net/http"
 	"strconv"
 	"yumee/booking/internal/booking"
@@ -32,6 +34,7 @@ func NewHouseHandler(service HouseService) HouseHandler {
 func (h *HouseHandler) GetHouses(c *gin.Context) {
 	houses, err := h.houseService.GetHouses(c.Request.Context())
 	if err != nil {
+		log.Default().Println("Error trying to fetch houses")
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "could not get houses",
 		})
@@ -45,13 +48,18 @@ func (h *HouseHandler) AddHouse(c *gin.Context) {
 	var req HouseRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Default().Println("Error trying to parse json body creating a new house")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	newHouse, err := h.houseService.AddHouse(c.Request.Context(), req.Type, req.Capacity)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if errors.Is(err, booking.InvalidHouseData) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Provided data is not valid"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
@@ -69,9 +77,15 @@ func (h *HouseHandler) RemoveHouse(c *gin.Context) {
 
 	err = h.houseService.RemoveHouse(c.Request.Context(), id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err,
-		})
+		if errors.Is(err, booking.HouseDoesNotExist) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": err,
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err,
+			})
+		}
 		return
 	}
 
