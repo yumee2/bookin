@@ -48,7 +48,7 @@ func (h *HouseHandler) AddHouse(c *gin.Context) {
 	var req HouseRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Default().Println("Error trying to parse json body creating a new house")
+		log.Println("Error trying to parse json body creating a new house")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -58,7 +58,8 @@ func (h *HouseHandler) AddHouse(c *gin.Context) {
 		if errors.Is(err, booking.InvalidHouseData) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Provided data is not valid"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			log.Printf("create house: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get house"})
 		}
 		return
 	}
@@ -78,12 +79,14 @@ func (h *HouseHandler) RemoveHouse(c *gin.Context) {
 	err = h.houseService.RemoveHouse(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, booking.HouseDoesNotExist) {
+			log.Println("remove house: house not found")
 			c.JSON(http.StatusNotFound, gin.H{
-				"error": err,
+				"error": "House not found",
 			})
 		} else {
+			log.Printf("remove house: %w", err)
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err,
+				"error": "could not remove house",
 			})
 		}
 		return

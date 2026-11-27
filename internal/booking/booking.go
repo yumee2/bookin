@@ -3,6 +3,7 @@ package booking
 import (
 	"context"
 	"errors"
+	"fmt"
 )
 
 type HouseRepository interface {
@@ -40,7 +41,7 @@ func (b *BookingService) AddHouse(ctx context.Context, houseTypeRaw string, capa
 
 	house, err := b.houseRepo.AddHouse(ctx, houseType, capacity)
 	if err != nil {
-		return nil, UnexpectedFailure
+		return nil, fmt.Errorf("add house: %w", err)
 	}
 
 	return house, nil
@@ -56,7 +57,8 @@ func (b *BookingService) RemoveHouse(ctx context.Context, houseID int) error {
 		if errors.Is(err, HouseDoesNotExist) {
 			return HouseDoesNotExist
 		}
-		return UnexpectedFailure
+		return fmt.Errorf("remove house: %w", err)
+
 	}
 
 	return nil
