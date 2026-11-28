@@ -34,7 +34,7 @@ func NewHouseHandler(service HouseService) HouseHandler {
 func (h *HouseHandler) GetHouses(c *gin.Context) {
 	houses, err := h.houseService.GetHouses(c.Request.Context())
 	if err != nil {
-		log.Default().Println("Error trying to fetch houses")
+		log.Default().Printf("get houses: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "could not get houses",
 		})
@@ -59,7 +59,7 @@ func (h *HouseHandler) AddHouse(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Provided data is not valid"})
 		} else {
 			log.Printf("create house: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get house"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create house"})
 		}
 		return
 	}
@@ -84,7 +84,7 @@ func (h *HouseHandler) RemoveHouse(c *gin.Context) {
 				"error": "House not found",
 			})
 		} else {
-			log.Printf("remove house: %w", err)
+			log.Printf("remove house: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "could not remove house",
 			})
