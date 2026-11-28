@@ -8,6 +8,11 @@ type HouseModel struct {
 	Capacity int               `gorm:"not null"`
 }
 
+// To implement Tabler interaface and rename the table in postgres
+func (HouseModel) TableName() string {
+	return "houses"
+}
+
 func toHouseModel(h booking.House) HouseModel {
 	return HouseModel{
 		ID:       h.ID,
